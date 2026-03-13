@@ -1478,67 +1478,205 @@ const builders = {
 // Step 2: fire ALL metadata requests in parallel (vs old sequential)
 // Step 3: from metadata, grab first playable MP3 — or guess the URL pattern
 //         which lets us skip metadata for common single-file items entirely
+function isGoodTrack(title, duration) {
+
+  const badWords = [
+    "podcast","lecture","interview","speech","lesson",
+    "talk","audiobook","chapter","episode","sermon",
+    "conference","tutorial"
+  ];
+
+  const t = (title || "").toLowerCase();
+
+  for (const word of badWords) {
+    if (t.includes(word)) return false;
+  }
+
+  // remove very short clips
+  if (duration && duration < 25) return false;
+
+  return true;
+}
+
+function scoreTrack(t) {
+
+  let score = 0;
+
+  // Prefer real songs
+  if (t.identifier === "jamendo") score += 5;
+  if (t.identifier === "freesound") score -= 1;
+
+  // Prefer longer tracks
+  const dur = Number(t.duration) || 0;
+
+  if (dur > 180) score += 3;
+  else if (dur > 120) score += 2;
+  else if (dur > 60) score += 1;
+
+  // Penalize unknown artists
+  if (!t.artist || t.artist === "Unknown") score -= 2;
+
+  return score;
+}
+
 
 async function fetchIAtracks(query, rows = 20, onProgress = null) {
-  const q = encodeURIComponent(`${query} AND format:(MP3) AND mediatype:(audio)`);
-  const url = `https://archive.org/advancedsearch.php?q=${q}&fl[]=identifier,title,creator,year&rows=${rows}&output=json&sort[]=downloads+desc`;
 
   onProgress?.('search', 0);
-  const res = await fetch(url);
-  const json = await res.json();
-  const items = (json.response?.docs || []).slice(0, 10);
-  onProgress?.('search', 100);
-
-  if (items.length === 0) return [];
-
-  onProgress?.('resolve', 0);
-
-  // Fire all metadata requests IN PARALLEL — key speed improvement
-  const metaPromises = items.map(item =>
-    fetch(`https://archive.org/metadata/${item.identifier}/files`)
-      .then(r => r.json())
-      .then(fdata => ({ item, fdata }))
-      .catch(() => null)
-  );
 
   const tracks = [];
-  let resolved = 0;
 
-  // Process as they complete, not waiting for all
-  const results = await Promise.allSettled(metaPromises);
+  const jamendoFetch = async () => {
+    try {
+      const jQuery = encodeURIComponent(query);
+      const jURL = `https://api.jamendo.com/v3.0/tracks/?client_id=a08d62b3&format=json&limit=8&search=${jQuery}`;
 
-  for (const result of results) {
-    if (result.status !== 'fulfilled' || !result.value) continue;
-    const { item, fdata } = result.value;
-    resolved++;
-    onProgress?.('resolve', Math.round((resolved / items.length) * 100));
+      const res = await fetch(jURL);
+      const json = await res.json();
 
-    const files = fdata.result || [];
-    // Prefer non-64kb MP3 files
-    const mp3s = files.filter(f =>
-      f.name?.toLowerCase().endsWith('.mp3') &&
-      !f.name.includes('64kb') &&
-      !f.name.includes('_sample')
-    );
+      const results = json.results || [];
 
-    if (mp3s.length > 0) {
-      const f = mp3s[0];
-      tracks.push({
-        url: `https://archive.org/download/${item.identifier}/${encodeURIComponent(f.name)}`,
-        title: f.title || f.name.replace(/\.mp3$/i, '').replace(/[_-]/g, ' ').trim(),
-        artist: item.creator || fdata.metadata?.creator || 'Unknown',
-        identifier: item.identifier,
-        duration: f.length || ''
-      });
+      const out = [];
+
+      for (const track of results) {
+
+        if (!track.audio) continue;
+        if (!isGoodTrack(track.name, track.duration)) continue;
+
+        out.push({
+          url: track.audio,
+          title: track.name,
+          artist: track.artist_name || "Jamendo Artist",
+          identifier: "jamendo",
+          duration: track.duration || ""
+        });
+
+        if (out.length >= 6) break;
+      }
+
+      return out;
+
+    } catch(e) {
+      console.warn("Jamendo fetch failed", e);
+      return [];
     }
+  };
 
-    if (tracks.length >= 7) break;
+
+  const archiveFetch = async () => {
+    try {
+
+      const q = encodeURIComponent(`${query} AND format:(MP3) AND mediatype:(audio)`);
+      const url = `https://archive.org/advancedsearch.php?q=${q}&fl[]=identifier,title,creator&rows=${rows}&output=json&sort[]=downloads+desc`;
+
+      const res = await fetch(url);
+      const json = await res.json();
+      const items = (json.response?.docs || []).slice(0, 8);
+
+      const metaPromises = items.map(item =>
+        fetch(`https://archive.org/metadata/${item.identifier}/files`)
+          .then(r => r.json())
+          .then(fdata => ({ item, fdata }))
+          .catch(() => null)
+      );
+
+      const results = await Promise.allSettled(metaPromises);
+
+      const out = [];
+
+      for (const result of results) {
+
+        if (result.status !== 'fulfilled' || !result.value) continue;
+
+        const { item, fdata } = result.value;
+        const files = fdata.result || [];
+
+        const mp3s = files.filter(f =>
+          f.name?.toLowerCase().endsWith('.mp3')
+        );
+
+        if (mp3s.length > 0) {
+
+          const f = mp3s[0];
+
+          if (!isGoodTrack(f.title || f.name, f.length)) continue;
+
+          out.push({
+            url: `https://archive.org/download/${item.identifier}/${encodeURIComponent(f.name)}`,
+            title: f.title || f.name.replace(/\.mp3$/i, '').replace(/[_-]/g, ' ').trim(),
+            artist: item.creator || fdata.metadata?.creator || 'Unknown',
+            identifier: item.identifier,
+            duration: f.length || ''
+          });
+        }
+
+        if (out.length >= 4) break;
+      }
+
+      return out;
+
+    } catch(e) {
+      console.warn("Internet Archive fetch failed", e);
+      return [];
+    }
+  };
+
+
+  const freesoundFetch = async () => {
+    try {
+
+      const fsQuery = encodeURIComponent(query);
+      const fsURL = `https://freesound.org/apiv2/search/text/?query=${fsQuery}&filter=duration:[20 TO 600]&page_size=4&fields=name,previews,username&token=G3GeYUtACBTIJoeyf6IbPNKGJ17tGpDrG5QHOoRe`;
+
+      const res = await fetch(fsURL);
+      const json = await res.json();
+
+      const results = json.results || [];
+
+      const out = [];
+
+      for (const sound of results) {
+
+        if (!sound.previews?.["preview-hq-mp3"]) continue;
+        if (!isGoodTrack(sound.name, 30)) continue;
+
+        out.push({
+          url: sound.previews["preview-hq-mp3"],
+          title: sound.name,
+          artist: sound.username || "Freesound",
+          identifier: "freesound",
+          duration: ""
+        });
+
+        if (out.length >= 2) break;
+      }
+
+      return out;
+
+    } catch(e) {
+      console.warn("Freesound fetch failed", e);
+      return [];
+    }
+  };
+
+
+  const results = await Promise.allSettled([
+    jamendoFetch(),
+    archiveFetch(),
+    freesoundFetch()
+  ]);
+
+
+  for (const r of results) {
+    if (r.status === "fulfilled") {
+      tracks.push(...r.value);
+    }
   }
 
   onProgress?.('resolve', 100);
+
   return tracks;
 }
-
 // ============================================================
 //  SIDEBAR FETCH PROGRESS HELPERS
 // ============================================================
@@ -1919,11 +2057,16 @@ async function searchArtist() {
 function playCentreTrack(i) {
   const t = discoverTracks[i];
   if (!t) return;
+
+  expandFromArtist(t.artist); // ← STEP 3 added here
+
   currentOnlineIndex = i;
   currentOnlineQueue = discoverTracks;
+
   document.querySelectorAll('#cp-track-list .cp-track').forEach((el, idx) => {
     el.classList.toggle('active', idx === i);
   });
+
   playOnlineTrack(t.url, t.title, t.artist, activeDiscCatTag);
 }
 
@@ -2221,6 +2364,37 @@ const DISC_CATEGORIES = [
 
 let activeDiscCatId = null;
 let activeDiscCatTag = '✦ Discovered';
+let artistDiscoveryMemory = new Set();
+
+async function expandFromArtist(artist) {
+
+  if (!artist || artistDiscoveryMemory.has(artist)) return;
+
+  artistDiscoveryMemory.add(artist);
+
+  try {
+
+    const query = artist + " music";
+
+    const results = await fetchIAtracks(query, 8);
+
+    const seen = new Set(currentOnlineQueue.map(t => t.url));
+
+    const unique = results.filter(t => {
+      if (seen.has(t.url)) return false;
+      seen.add(t.url);
+      return true;
+    });
+
+    currentOnlineQueue.push(...unique);
+
+    console.log("Artist expansion:", artist, "→", unique.length);
+
+  } catch(e) {
+    console.warn("Artist expansion failed", e);
+  }
+}
+
 
 function buildDiscoverCards() {
   const grid = document.getElementById('disc-cat-grid');
@@ -2280,7 +2454,24 @@ async function loadDiscoverCat(cat) {
   }
 
   try {
-    const picked = [...cat.queries].sort(() => Math.random()-0.5).slice(0, 3);
+   const baseQueries = [...cat.queries].sort(() => Math.random()-0.5).slice(0, 3);
+
+const picked = [];
+
+for (const q of baseQueries) {
+
+  picked.push(q);
+
+  const words = q.split(" ");
+
+  if (words.length > 3) {
+    picked.push(words.slice(0,3).join(" "));
+  }
+
+  if (words.length > 4) {
+    picked.push(words.slice(0,4).join(" "));
+  }
+}
 
     const progressCb = (phase, pct) => {
       if (phase === 'search') {
@@ -2308,9 +2499,12 @@ async function loadDiscoverCat(cat) {
 
     const seen = new Set();
     const unique = all.filter(t => {
-      if (seen.has(t.url)) return false;
-      seen.add(t.url); return true;
-    }).sort(() => Math.random()-0.5).slice(0, 14);
+          if (seen.has(t.url)) return false;
+            seen.add(t.url);
+            return true;
+            })
+           .sort((a,b) => scoreTrack(b) - scoreTrack(a))
+           .slice(0, 14);
 
     discoverTracks      = unique;
     currentOnlineQueue  = unique;
@@ -2371,6 +2565,7 @@ async function refreshChannel() {
   if (cat) await loadDiscoverCat(cat);
 }
 
+
 function playDiscoverTrack(i) {
   playCentreTrack(i);
 }
@@ -2379,15 +2574,60 @@ function playDiscoverTrack(i) {
 //  TRANSPORT
 // ============================================================
 function nextTrack() {
+
   if (currentOnlineQueue.length === 0) return;
+
   let next = shuffleOn
     ? Math.floor(Math.random() * currentOnlineQueue.length)
     : (currentOnlineIndex + 1) % currentOnlineQueue.length;
+
   currentOnlineIndex = next;
+
+  // 🔁 AUTO REFILL WHEN QUEUE GETS LOW
+  const remaining = currentOnlineQueue.length - currentOnlineIndex;
+
+  if (remaining <= 5 && activeDiscCatId) {
+    refillDiscoverQueue();
+  }
 
   if (currentOnlineQueue === composerTracks) playComposerTrack(next);
   else playDiscoverTrack(next);
 }
+
+async function refillDiscoverQueue() {
+
+  const cat = DISC_CATEGORIES.find(c => c.id === activeDiscCatId);
+  if (!cat) return;
+
+  try {
+
+    const picked = [...cat.queries]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 2);
+
+    const results = await Promise.all(
+      picked.map(q => fetchIAtracks(q, 10))
+    );
+
+    const newTracks = results.flat();
+
+    const seen = new Set(currentOnlineQueue.map(t => t.url));
+
+    const unique = newTracks.filter(t => {
+      if (seen.has(t.url)) return false;
+      seen.add(t.url);
+      return true;
+    });
+
+    currentOnlineQueue.push(...unique);
+
+    console.log("Queue expanded →", currentOnlineQueue.length);
+
+  } catch(e) {
+    console.warn("Queue refill failed", e);
+  }
+}
+
 
 function prevTrack() {
   if (currentOnlineQueue.length === 0) return;
