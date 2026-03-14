@@ -4,34 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Æther — Ambient Music</title>
-<link rel="icon" type="image/jpeg" href="/favicon.jpg">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400&display=swap');
 
 :root {
-  /* Warm parchment / linen palette */
-  --bg:          #f4efe6;   /* warm off-white parchment */
-  --surface:     #ede7db;   /* slightly deeper linen */
-  --card:        #e6dfd2;   /* card background */
-  --border:      #d5ccbf;   /* soft dividers */
-  --border2:     #c4baac;   /* stronger dividers */
-  --accent:      #7a5c3e;   /* walnut brown — primary interactive */
-  --accent2:     #b86f30;   /* amber — session, tags */
-  --accent3:     #5a7f5a;   /* sage green — online / now playing */
-  --text:        #4a3b2e;   /* warm dark brown body text */
-  --text-bright: #2c1e10;   /* near-black headings */
-  --muted:       #a8977f;   /* light label text */
-  --muted2:      #8a7a65;   /* secondary labels */
-  --glow:        rgba(122,92,62,0.10);
-  --glow2:       rgba(122,92,62,0.20);
+  /* Deep navy blue + gold dark mode */
+  --bg:          #0d1b2e;   /* deep ocean navy */
+  --surface:     #112240;   /* slightly lighter navy */
+  --card:        #162a4a;   /* card / panel blue */
+  --border:      #1e3a5f;   /* subtle blue divider */
+  --border2:     #254d7a;   /* stronger blue divider */
+  --accent:      #c9a84c;   /* rich gold — primary interactive */
+  --accent2:     #e8c86a;   /* bright gold — headings, session */
+  --accent3:     #7abfb0;   /* soft teal — online / now playing */
+  --text:        #b8c8d8;   /* cool blue-grey body text */
+  --text-bright: #f0d080;   /* warm gold — titles, bright text */
+  --muted:       #3a5470;   /* muted blue labels */
+  --muted2:      #4a6888;   /* secondary blue labels */
+  --glow:        rgba(201,168,76,0.12);
+  --glow2:       rgba(201,168,76,0.26);
   --sidebar-w: 280px;
   --bar-h: 88px;
+}
+
+/* ── Light mode overrides ── */
+body.light {
+  --bg:          #f2eeea;
+  --surface:     #e8e3dc;
+  --card:        #ddd7cf;
+  --border:      #ccc5bb;
+  --border2:     #b8b0a4;
+  --accent:      #7a5c3e;
+  --accent2:     #b86f30;
+  --accent3:     #4a7f6a;
+  --text:        #3a2e24;
+  --text-bright: #1e1208;
+  --muted:       #9a8878;
+  --muted2:      #7a6a5a;
+  --glow:        rgba(122,92,62,0.10);
+  --glow2:       rgba(122,92,62,0.22);
 }
 
 * { margin:0; padding:0; box-sizing:border-box; }
 ::-webkit-scrollbar { width:4px; }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
+::-webkit-scrollbar-track { background:var(--surface); }
 
 body {
   background: var(--bg);
@@ -43,14 +61,13 @@ body {
   flex-direction: column;
 }
 
-/* ── Background: subtle warm grain + radial vignette, no photo ── */
+/* ── Background: deep navy with subtle gold light-leak ── */
 #cosmos {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  /* Warm paper grain texture via CSS */
   background:
-    radial-gradient(ellipse at 30% 20%, rgba(184,111,48,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(90,127,90,0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 60% 50%, rgba(122,92,62,0.04) 0%, transparent 70%);
+    radial-gradient(ellipse at 20% 15%, rgba(201,168,76,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(122,180,176,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 55% 45%, rgba(30,58,95,0.40)   0%, transparent 70%);
 }
 
 /* ── Main 3-region layout ── */
@@ -69,7 +86,7 @@ body {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  background: rgba(244,239,230,0.95);
+  background: rgba(13,27,46,0.95);
   backdrop-filter: blur(16px);
   overflow: hidden;
   height: 100%;
@@ -97,7 +114,7 @@ body {
   padding: 0.65rem 0.9rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  background: rgba(237,231,219,0.6);
+  background: rgba(17,34,64,0.70);
 }
 .artist-search-row { display:flex; gap:0.4rem; align-items:center; }
 .artist-search-input {
@@ -182,7 +199,7 @@ body {
   padding:0.7rem 1rem; cursor:pointer;
   border-bottom:1px solid rgba(28,35,51,0.5); transition:background 0.15s;
 }
-.composer-item:hover { background:rgba(138,180,201,0.04); }
+.composer-item:hover { background:rgba(201,168,76,0.06); }
 .composer-item.active { background:var(--glow); border-left:2px solid var(--accent); }
 .composer-avatar {
   width:30px; height:30px; border-radius:50%;
@@ -213,7 +230,7 @@ body {
   position:relative; overflow:hidden;
 }
 .disc-cat-card:hover { border-color:var(--border2); background:var(--card); }
-.disc-cat-card.active { box-shadow:0 0 14px -4px rgba(138,180,201,0.4); }
+.disc-cat-card.active { box-shadow:0 0 14px -4px rgba(201,168,76,0.24); }
 .disc-cat-icon { font-size:1.15rem; display:block; margin-bottom:0.25rem; }
 .disc-cat-name {
   font-size:0.62rem; font-weight:400; display:block;
@@ -247,9 +264,9 @@ body {
 .disc-track {
   display:flex; align-items:center; gap:0.7rem;
   padding:0.6rem 1rem; cursor:pointer;
-  border-bottom:1px solid rgba(180,165,145,0.4); transition:background 0.15s;
+  border-bottom:1px solid rgba(30,58,95,0.6); transition:background 0.15s;
 }
-.disc-track:hover { background:rgba(138,180,201,0.04); }
+.disc-track:hover { background:rgba(201,168,76,0.06); }
 .disc-track.active { background:var(--glow); border-left:2px solid var(--accent3); }
 .disc-track-num { font-size:0.58rem; color:var(--muted); width:14px; text-align:right; flex-shrink:0; }
 .disc-track.active .disc-track-num { color:var(--accent3); }
@@ -268,7 +285,7 @@ body {
 /* Skeleton rows */
 .skel-track {
   display:flex; align-items:center; gap:0.7rem;
-  padding:0.6rem 1rem; border-bottom:1px solid rgba(180,165,145,0.4);
+  padding:0.6rem 1rem; border-bottom:1px solid rgba(30,58,95,0.6);
 }
 .skel-num { width:14px; height:7px; background:var(--border2); border-radius:2px; flex-shrink:0; }
 .skel-info { flex:1; }
@@ -290,7 +307,7 @@ body {
   flex-direction:column;
   overflow:hidden;
   position:relative;
-  background:rgba(244,239,230,0.70);
+  background:rgba(13,27,46,0.80);
   backdrop-filter:blur(6px);
 }
 
@@ -307,27 +324,27 @@ body {
 .np-orb {
   width:148px; height:148px; border-radius:50%;
   border:1px solid var(--border2);
-  background:radial-gradient(circle at 40% 35%, rgba(184,111,48,0.10), rgba(230,220,205,0.6));
+  background:radial-gradient(circle at 40% 35%, rgba(201,168,76,0.12), rgba(13,27,46,0.80));
   display:flex; align-items:center; justify-content:center;
   margin-bottom:1.8rem; position:relative; transition:box-shadow 0.5s;
 }
 .np-orb.playing {
-  box-shadow:0 0 60px rgba(138,180,201,0.15), 0 0 120px rgba(138,180,201,0.05);
+  box-shadow:0 0 60px rgba(201,168,76,0.14), 0 0 120px rgba(201,168,76,0.07);
   animation:orb-pulse 4s ease-in-out infinite;
 }
 @keyframes orb-pulse {
-  0%,100% { box-shadow:0 0 40px rgba(138,180,201,0.12), 0 0 80px rgba(138,180,201,0.04); }
-  50%      { box-shadow:0 0 80px rgba(138,180,201,0.22), 0 0 160px rgba(138,180,201,0.08); }
+  0%,100% { box-shadow:0 0 40px rgba(201,168,76,0.12), 0 0 80px rgba(201,168,76,0.06); }
+  50%      { box-shadow:0 0 80px rgba(201,168,76,0.22), 0 0 160px rgba(201,168,76,0.09); }
 }
 .np-orb-inner {
   width:100px; height:100px; border-radius:50%;
   border:1px solid var(--border2);
   display:flex; align-items:center; justify-content:center;
   font-size:2.5rem;
-  background:radial-gradient(circle at 40% 35%, rgba(138,180,201,0.08), transparent);
+  background:radial-gradient(circle at 40% 35%, rgba(201,168,76,0.09), transparent);
 }
-.np-ring  { position:absolute; inset:-8px;  border-radius:50%; border:1px solid rgba(138,180,201,0.08); }
-.np-ring2 { position:absolute; inset:-20px; border-radius:50%; border:1px solid rgba(138,180,201,0.04); }
+.np-ring  { position:absolute; inset:-8px;  border-radius:50%; border:1px solid rgba(201,168,76,0.09); }
+.np-ring2 { position:absolute; inset:-20px; border-radius:50%; border:1px solid rgba(201,168,76,0.06); }
 
 .np-title {
   font-family:'Cormorant Garamond',serif; font-weight:300; font-style:italic;
@@ -341,7 +358,7 @@ body {
 .np-mode-tag {
   display:inline-block; font-size:0.52rem; letter-spacing:0.2em;
   text-transform:uppercase; color:var(--accent2);
-  border:1px solid rgba(201,168,126,0.25); padding:0.18rem 0.55rem;
+  border:1px solid rgba(201,168,76,0.35); padding:0.18rem 0.55rem;
   border-radius:20px; margin-top:0.35rem;
 }
 
@@ -366,7 +383,7 @@ body {
   padding:1.2rem 1.6rem 0.8rem;
   border-bottom:1px solid var(--border);
   flex-shrink:0;
-  background:rgba(237,231,219,0.75);
+  background:rgba(17,34,64,0.80);
 }
 .cp-header-row {
   display:flex; align-items:center; gap:0.8rem; margin-bottom:0.5rem;
@@ -441,9 +458,9 @@ body {
 .cp-track {
   display:flex; align-items:center; gap:1rem;
   padding:0.75rem 1.6rem; cursor:pointer;
-  border-bottom:1px solid rgba(180,165,145,0.35); transition:background 0.15s;
+  border-bottom:1px solid rgba(30,58,95,0.5); transition:background 0.15s;
 }
-.cp-track:hover { background:rgba(122,92,62,0.06); }
+.cp-track:hover { background:rgba(201,168,76,0.07); }
 .cp-track.active { background:var(--glow); border-left:3px solid var(--accent3); }
 .cp-track-num { font-size:0.62rem; color:var(--muted); width:18px; text-align:right; flex-shrink:0; }
 .cp-track.active .cp-track-num { color:var(--accent3); }
@@ -462,7 +479,7 @@ body {
 /* Centre skeleton */
 .cp-skel {
   display:flex; align-items:center; gap:1rem;
-  padding:0.75rem 1.6rem; border-bottom:1px solid rgba(180,165,145,0.35);
+  padding:0.75rem 1.6rem; border-bottom:1px solid rgba(30,58,95,0.5);
 }
 .cp-skel-num { width:18px; height:8px; background:var(--border2); border-radius:2px; flex-shrink:0; animation:skel-pulse 1.5s ease-in-out infinite; }
 .cp-skel-info { flex:1; }
@@ -474,7 +491,7 @@ body {
 .player-bar {
   position:fixed; bottom:0; left:0; right:0;
   height:var(--bar-h);
-  background:rgba(244,239,230,0.97);
+  background:rgba(11,22,40,0.97); backdrop-filter:blur(20px);
   backdrop-filter:blur(20px);
   border-top:1px solid var(--border);
   display:flex; align-items:center;
@@ -490,12 +507,12 @@ body {
 }
 .pb-orb {
   width:46px; height:46px; border-radius:50%; flex-shrink:0;
-  background:radial-gradient(circle at 35% 30%, rgba(184,111,48,0.12), rgba(230,220,205,0.5));
+  background:radial-gradient(circle at 35% 30%, rgba(201,168,76,0.14), rgba(13,27,46,0.85));
   border:1px solid var(--border2);
   display:flex; align-items:center; justify-content:center;
   font-size:1.3rem; transition:box-shadow 0.4s;
 }
-.pb-orb.playing { box-shadow:0 0 18px rgba(138,180,201,0.2); }
+.pb-orb.playing { box-shadow:0 0 18px rgba(201,168,76,0.14); }
 .pb-info { min-width:0; flex:1; }
 .pb-title {
   font-size:0.75rem; color:var(--text-bright); display:block;
@@ -511,7 +528,7 @@ body {
   padding:0.15rem 0.5rem; border-radius:20px;
   border:1px solid var(--border2); color:var(--muted2); display:inline-block; margin-top:0.2rem;
 }
-.pb-badge.online { border-color:rgba(139,201,168,0.3); color:var(--accent3); }
+.pb-badge.online { border-color:rgba(122,180,176,0.40); color:var(--accent3); }
 
 /* Centre section — transport + progress */
 .pb-centre {
@@ -553,7 +570,7 @@ body {
 .pb-track-fill { height:100%; background:var(--accent); border-radius:2px; width:0%; transition:width 0.5s linear; }
 .pb-buffer-fill {
   position:absolute; top:0; left:0; height:100%;
-  background:rgba(138,180,201,0.2); border-radius:2px;
+  background:rgba(201,168,76,0.14); border-radius:2px;
   width:0%; transition:width 0.5s ease;
 }
 
@@ -589,12 +606,12 @@ body {
     z-index:50; transform:translateX(-100%); transition:transform 0.3s;
     height:auto;
   }
-  .sidebar.open { transform:translateX(0); box-shadow:8px 0 40px rgba(100,80,60,0.18); }
+  .sidebar.open { transform:translateX(0); box-shadow:8px 0 40px rgba(0,10,25,0.55); }
 
   .sidebar-toggle {
     display:flex; position:fixed;
     top:0.75rem; left:0.75rem; z-index:60;
-    background:rgba(244,239,230,0.92); backdrop-filter:blur(8px);
+    background:rgba(13,27,46,0.92); backdrop-filter:blur(8px);
     border:1px solid var(--border2); color:var(--text);
     font-size:0.95rem; width:34px; height:34px;
     align-items:center; justify-content:center;
@@ -614,6 +631,45 @@ body {
 
   .cp-track { padding:0.65rem 1rem; }
   .cp-header { padding:0.9rem 1rem 0.6rem; }
+}
+
+/* ── Theme toggle button — icon only ── */
+.theme-btn {
+  position: fixed;
+  top: 1rem; right: 1rem;
+  z-index: 80;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  backdrop-filter: blur(8px);
+  font-size: 1.05rem;
+  line-height: 1;
+}
+.theme-btn:hover {
+  border-color: var(--accent);
+  transform: scale(1.08);
+  box-shadow: 0 0 12px var(--glow2);
+}
+
+/* Light mode — override every hardcoded navy surface */
+body.light .sidebar         { background: rgba(242,238,234,0.96) !important; }
+body.light .player-bar      { background: rgba(242,238,234,0.97) !important; }
+body.light .cp-header       { background: var(--surface) !important; }
+body.light .main            { background: rgba(242,238,234,0.70) !important; }
+body.light .artist-search-wrap { background: rgba(232,226,218,0.80) !important; }
+body.light .sidebar-toggle  { background: rgba(242,238,234,0.92) !important; }
+body.light .centre-loading  { background: transparent !important; }
+body.light .np-orb {
+  background: radial-gradient(circle at 40% 35%, rgba(122,92,62,0.14), rgba(232,226,218,0.6)) !important;
+}
+body.light .pb-orb {
+  background: radial-gradient(circle at 35% 30%, rgba(122,92,62,0.12), rgba(232,226,218,0.5)) !important;
 }
 
 /* Toast */
@@ -789,6 +845,8 @@ body {
 </div>
 
 <!-- Mobile sidebar toggle -->
+<button class="theme-btn" id="theme-btn" onclick="toggleTheme()" title="Toggle light / dark mode">🌙</button>
+
 <button class="sidebar-toggle" id="sidebar-toggle"
   onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
 
@@ -823,7 +881,7 @@ body {
     </div>
   </div>
 
-  <!-- Right: knobs + session timer -->
+  <!-- Right: knobs -->
   <div class="pb-right">
     <div class="knob-grp">
       <span class="knob-lbl">Vol</span>
@@ -853,6 +911,8 @@ body {
 // ============================================================
 //  STATE
 // ============================================================
+let _lightMode = false;   // must be first — drawKnob reads this on load
+
 let audioCtx, masterGain, analyser;
 let genNodes = [];
 let playing = false;
@@ -1478,205 +1538,67 @@ const builders = {
 // Step 2: fire ALL metadata requests in parallel (vs old sequential)
 // Step 3: from metadata, grab first playable MP3 — or guess the URL pattern
 //         which lets us skip metadata for common single-file items entirely
-function isGoodTrack(title, duration) {
-
-  const badWords = [
-    "podcast","lecture","interview","speech","lesson",
-    "talk","audiobook","chapter","episode","sermon",
-    "conference","tutorial"
-  ];
-
-  const t = (title || "").toLowerCase();
-
-  for (const word of badWords) {
-    if (t.includes(word)) return false;
-  }
-
-  // remove very short clips
-  if (duration && duration < 25) return false;
-
-  return true;
-}
-
-function scoreTrack(t) {
-
-  let score = 0;
-
-  // Prefer real songs
-  if (t.identifier === "jamendo") score += 5;
-  if (t.identifier === "freesound") score -= 1;
-
-  // Prefer longer tracks
-  const dur = Number(t.duration) || 0;
-
-  if (dur > 180) score += 3;
-  else if (dur > 120) score += 2;
-  else if (dur > 60) score += 1;
-
-  // Penalize unknown artists
-  if (!t.artist || t.artist === "Unknown") score -= 2;
-
-  return score;
-}
-
 
 async function fetchIAtracks(query, rows = 20, onProgress = null) {
+  const q = encodeURIComponent(`${query} AND format:(MP3) AND mediatype:(audio)`);
+  const url = `https://archive.org/advancedsearch.php?q=${q}&fl[]=identifier,title,creator,year&rows=${rows}&output=json&sort[]=downloads+desc`;
 
   onProgress?.('search', 0);
+  const res = await fetch(url);
+  const json = await res.json();
+  const items = (json.response?.docs || []).slice(0, 10);
+  onProgress?.('search', 100);
+
+  if (items.length === 0) return [];
+
+  onProgress?.('resolve', 0);
+
+  // Fire all metadata requests IN PARALLEL — key speed improvement
+  const metaPromises = items.map(item =>
+    fetch(`https://archive.org/metadata/${item.identifier}/files`)
+      .then(r => r.json())
+      .then(fdata => ({ item, fdata }))
+      .catch(() => null)
+  );
 
   const tracks = [];
+  let resolved = 0;
 
-  const jamendoFetch = async () => {
-    try {
-      const jQuery = encodeURIComponent(query);
-      const jURL = `https://api.jamendo.com/v3.0/tracks/?client_id=a08d62b3&format=json&limit=8&search=${jQuery}`;
+  // Process as they complete, not waiting for all
+  const results = await Promise.allSettled(metaPromises);
 
-      const res = await fetch(jURL);
-      const json = await res.json();
+  for (const result of results) {
+    if (result.status !== 'fulfilled' || !result.value) continue;
+    const { item, fdata } = result.value;
+    resolved++;
+    onProgress?.('resolve', Math.round((resolved / items.length) * 100));
 
-      const results = json.results || [];
+    const files = fdata.result || [];
+    // Prefer non-64kb MP3 files
+    const mp3s = files.filter(f =>
+      f.name?.toLowerCase().endsWith('.mp3') &&
+      !f.name.includes('64kb') &&
+      !f.name.includes('_sample')
+    );
 
-      const out = [];
-
-      for (const track of results) {
-
-        if (!track.audio) continue;
-        if (!isGoodTrack(track.name, track.duration)) continue;
-
-        out.push({
-          url: track.audio,
-          title: track.name,
-          artist: track.artist_name || "Jamendo Artist",
-          identifier: "jamendo",
-          duration: track.duration || ""
-        });
-
-        if (out.length >= 6) break;
-      }
-
-      return out;
-
-    } catch(e) {
-      console.warn("Jamendo fetch failed", e);
-      return [];
+    if (mp3s.length > 0) {
+      const f = mp3s[0];
+      tracks.push({
+        url: `https://archive.org/download/${item.identifier}/${encodeURIComponent(f.name)}`,
+        title: f.title || f.name.replace(/\.mp3$/i, '').replace(/[_-]/g, ' ').trim(),
+        artist: item.creator || fdata.metadata?.creator || 'Unknown',
+        identifier: item.identifier,
+        duration: f.length || ''
+      });
     }
-  };
 
-
-  const archiveFetch = async () => {
-    try {
-
-      const q = encodeURIComponent(`${query} AND format:(MP3) AND mediatype:(audio)`);
-      const url = `https://archive.org/advancedsearch.php?q=${q}&fl[]=identifier,title,creator&rows=${rows}&output=json&sort[]=downloads+desc`;
-
-      const res = await fetch(url);
-      const json = await res.json();
-      const items = (json.response?.docs || []).slice(0, 8);
-
-      const metaPromises = items.map(item =>
-        fetch(`https://archive.org/metadata/${item.identifier}/files`)
-          .then(r => r.json())
-          .then(fdata => ({ item, fdata }))
-          .catch(() => null)
-      );
-
-      const results = await Promise.allSettled(metaPromises);
-
-      const out = [];
-
-      for (const result of results) {
-
-        if (result.status !== 'fulfilled' || !result.value) continue;
-
-        const { item, fdata } = result.value;
-        const files = fdata.result || [];
-
-        const mp3s = files.filter(f =>
-          f.name?.toLowerCase().endsWith('.mp3')
-        );
-
-        if (mp3s.length > 0) {
-
-          const f = mp3s[0];
-
-          if (!isGoodTrack(f.title || f.name, f.length)) continue;
-
-          out.push({
-            url: `https://archive.org/download/${item.identifier}/${encodeURIComponent(f.name)}`,
-            title: f.title || f.name.replace(/\.mp3$/i, '').replace(/[_-]/g, ' ').trim(),
-            artist: item.creator || fdata.metadata?.creator || 'Unknown',
-            identifier: item.identifier,
-            duration: f.length || ''
-          });
-        }
-
-        if (out.length >= 4) break;
-      }
-
-      return out;
-
-    } catch(e) {
-      console.warn("Internet Archive fetch failed", e);
-      return [];
-    }
-  };
-
-
-  const freesoundFetch = async () => {
-    try {
-
-      const fsQuery = encodeURIComponent(query);
-      const fsURL = `https://freesound.org/apiv2/search/text/?query=${fsQuery}&filter=duration:[20 TO 600]&page_size=4&fields=name,previews,username&token=G3GeYUtACBTIJoeyf6IbPNKGJ17tGpDrG5QHOoRe`;
-
-      const res = await fetch(fsURL);
-      const json = await res.json();
-
-      const results = json.results || [];
-
-      const out = [];
-
-      for (const sound of results) {
-
-        if (!sound.previews?.["preview-hq-mp3"]) continue;
-        if (!isGoodTrack(sound.name, 30)) continue;
-
-        out.push({
-          url: sound.previews["preview-hq-mp3"],
-          title: sound.name,
-          artist: sound.username || "Freesound",
-          identifier: "freesound",
-          duration: ""
-        });
-
-        if (out.length >= 2) break;
-      }
-
-      return out;
-
-    } catch(e) {
-      console.warn("Freesound fetch failed", e);
-      return [];
-    }
-  };
-
-
-  const results = await Promise.allSettled([
-    jamendoFetch(),
-    archiveFetch(),
-    freesoundFetch()
-  ]);
-
-
-  for (const r of results) {
-    if (r.status === "fulfilled") {
-      tracks.push(...r.value);
-    }
+    if (tracks.length >= 7) break;
   }
 
   onProgress?.('resolve', 100);
-
   return tracks;
 }
+
 // ============================================================
 //  SIDEBAR FETCH PROGRESS HELPERS
 // ============================================================
@@ -2057,16 +1979,11 @@ async function searchArtist() {
 function playCentreTrack(i) {
   const t = discoverTracks[i];
   if (!t) return;
-
-  expandFromArtist(t.artist); // ← STEP 3 added here
-
   currentOnlineIndex = i;
   currentOnlineQueue = discoverTracks;
-
   document.querySelectorAll('#cp-track-list .cp-track').forEach((el, idx) => {
     el.classList.toggle('active', idx === i);
   });
-
   playOnlineTrack(t.url, t.title, t.artist, activeDiscCatTag);
 }
 
@@ -2185,7 +2102,7 @@ const DISC_CATEGORIES = [
     icon: '🎬',
     name: 'Film Scores',
     sub: 'Hans Zimmer, Ennio Morricone, John Williams…',
-    color: '#c9a87e',
+    color: '#c9a84c',
     tag: '🎬 Cinematic',
     queries: [
       'hans zimmer instrumental soundtrack',
@@ -2200,7 +2117,7 @@ const DISC_CATEGORIES = [
     icon: '🧠',
     name: 'Deep Focus',
     sub: 'Lo-fi, slow piano, study music',
-    color: '#8ab4c9',
+    color: '#e8c86a',
     tag: '🧠 Focus',
     queries: [
       'lo-fi instrumental piano study',
@@ -2215,7 +2132,7 @@ const DISC_CATEGORIES = [
     icon: '🌌',
     name: 'Post-Rock & Slow Burn',
     sub: 'Godspeed, Explosions in the Sky vibes',
-    color: '#9b8bc9',
+    color: '#d4a840',
     tag: '🌌 Post-Rock',
     queries: [
       'post rock instrumental ambient',
@@ -2230,7 +2147,7 @@ const DISC_CATEGORIES = [
     icon: '🫁',
     name: 'Minimal Vocals',
     sub: '"Something in the Way" quiet, hushed, sparse',
-    color: '#c98b8b',
+    color: '#c87060',
     tag: '🫁 Hushed',
     queries: [
       'quiet minimal vocals slow acoustic',
@@ -2245,7 +2162,7 @@ const DISC_CATEGORIES = [
     icon: '🔮',
     name: 'Deep Indie',
     sub: 'Niche, bedroom, under-the-radar gems',
-    color: '#8bc9a8',
+    color: '#7abfb0',
     tag: '🔮 Indie',
     queries: [
       'indie folk bedroom recording obscure',
@@ -2260,7 +2177,7 @@ const DISC_CATEGORIES = [
     icon: '🪘',
     name: 'World & Meditative',
     sub: 'Sitar, koto, gamelan, Sufi, folk trance',
-    color: '#c9b88b',
+    color: '#c8a040',
     tag: '🪘 World',
     queries: [
       'sitar raga meditative instrumental',
@@ -2275,7 +2192,7 @@ const DISC_CATEGORIES = [
     icon: '🎷',
     name: 'Jazz & Noir',
     sub: 'Late-night, smoky, Miles Davis mood',
-    color: '#8ba8c9',
+    color: '#7ab0a0',
     tag: '🎷 Jazz',
     queries: [
       'cool jazz instrumental late night',
@@ -2290,7 +2207,7 @@ const DISC_CATEGORIES = [
     icon: '🎻',
     name: 'Neo-Classical',
     sub: 'Nils Frahm, Ólafur Arnalds, Max Richter',
-    color: '#a8c98b',
+    color: '#90b870',
     tag: '🎻 Neo-Classical',
     queries: [
       'nils frahm style piano ambient',
@@ -2305,7 +2222,7 @@ const DISC_CATEGORIES = [
     icon: '🌊',
     name: 'Electronic Ambient',
     sub: 'Brian Eno, Aphex Twin calm, Boards of Canada',
-    color: '#8bc9c9',
+    color: '#6ab8b0',
     tag: '🌊 Electronic',
     queries: [
       'brian eno style ambient electronic',
@@ -2320,7 +2237,7 @@ const DISC_CATEGORIES = [
     icon: '🎸',
     name: 'Guitar & Introspection',
     sub: 'Fingerpicking, open tuning, quiet dusk',
-    color: '#c9c98b',
+    color: '#c8b050',
     tag: '🎸 Guitar',
     queries: [
       'fingerpicking acoustic guitar ambient',
@@ -2364,37 +2281,6 @@ const DISC_CATEGORIES = [
 
 let activeDiscCatId = null;
 let activeDiscCatTag = '✦ Discovered';
-let artistDiscoveryMemory = new Set();
-
-async function expandFromArtist(artist) {
-
-  if (!artist || artistDiscoveryMemory.has(artist)) return;
-
-  artistDiscoveryMemory.add(artist);
-
-  try {
-
-    const query = artist + " music";
-
-    const results = await fetchIAtracks(query, 8);
-
-    const seen = new Set(currentOnlineQueue.map(t => t.url));
-
-    const unique = results.filter(t => {
-      if (seen.has(t.url)) return false;
-      seen.add(t.url);
-      return true;
-    });
-
-    currentOnlineQueue.push(...unique);
-
-    console.log("Artist expansion:", artist, "→", unique.length);
-
-  } catch(e) {
-    console.warn("Artist expansion failed", e);
-  }
-}
-
 
 function buildDiscoverCards() {
   const grid = document.getElementById('disc-cat-grid');
@@ -2415,7 +2301,7 @@ async function selectDiscoverCat(id) {
 
   document.querySelectorAll('.disc-cat-card').forEach(el => {
     el.classList.remove('active');
-    el.style.borderColor = 'rgba(180,165,145,0.5)';
+    el.style.borderColor = 'rgba(30,58,95,1)';
   });
   const card = document.getElementById('dcc-' + id);
   card.classList.add('active');
@@ -2454,24 +2340,7 @@ async function loadDiscoverCat(cat) {
   }
 
   try {
-   const baseQueries = [...cat.queries].sort(() => Math.random()-0.5).slice(0, 3);
-
-const picked = [];
-
-for (const q of baseQueries) {
-
-  picked.push(q);
-
-  const words = q.split(" ");
-
-  if (words.length > 3) {
-    picked.push(words.slice(0,3).join(" "));
-  }
-
-  if (words.length > 4) {
-    picked.push(words.slice(0,4).join(" "));
-  }
-}
+    const picked = [...cat.queries].sort(() => Math.random()-0.5).slice(0, 3);
 
     const progressCb = (phase, pct) => {
       if (phase === 'search') {
@@ -2499,12 +2368,9 @@ for (const q of baseQueries) {
 
     const seen = new Set();
     const unique = all.filter(t => {
-          if (seen.has(t.url)) return false;
-            seen.add(t.url);
-            return true;
-            })
-           .sort((a,b) => scoreTrack(b) - scoreTrack(a))
-           .slice(0, 14);
+      if (seen.has(t.url)) return false;
+      seen.add(t.url); return true;
+    }).sort(() => Math.random()-0.5).slice(0, 14);
 
     discoverTracks      = unique;
     currentOnlineQueue  = unique;
@@ -2565,7 +2431,6 @@ async function refreshChannel() {
   if (cat) await loadDiscoverCat(cat);
 }
 
-
 function playDiscoverTrack(i) {
   playCentreTrack(i);
 }
@@ -2574,60 +2439,15 @@ function playDiscoverTrack(i) {
 //  TRANSPORT
 // ============================================================
 function nextTrack() {
-
   if (currentOnlineQueue.length === 0) return;
-
   let next = shuffleOn
     ? Math.floor(Math.random() * currentOnlineQueue.length)
     : (currentOnlineIndex + 1) % currentOnlineQueue.length;
-
   currentOnlineIndex = next;
-
-  // 🔁 AUTO REFILL WHEN QUEUE GETS LOW
-  const remaining = currentOnlineQueue.length - currentOnlineIndex;
-
-  if (remaining <= 5 && activeDiscCatId) {
-    refillDiscoverQueue();
-  }
 
   if (currentOnlineQueue === composerTracks) playComposerTrack(next);
   else playDiscoverTrack(next);
 }
-
-async function refillDiscoverQueue() {
-
-  const cat = DISC_CATEGORIES.find(c => c.id === activeDiscCatId);
-  if (!cat) return;
-
-  try {
-
-    const picked = [...cat.queries]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 2);
-
-    const results = await Promise.all(
-      picked.map(q => fetchIAtracks(q, 10))
-    );
-
-    const newTracks = results.flat();
-
-    const seen = new Set(currentOnlineQueue.map(t => t.url));
-
-    const unique = newTracks.filter(t => {
-      if (seen.has(t.url)) return false;
-      seen.add(t.url);
-      return true;
-    });
-
-    currentOnlineQueue.push(...unique);
-
-    console.log("Queue expanded →", currentOnlineQueue.length);
-
-  } catch(e) {
-    console.warn("Queue refill failed", e);
-  }
-}
-
 
 function prevTrack() {
   if (currentOnlineQueue.length === 0) return;
@@ -2760,6 +2580,7 @@ function seekTrack(e, el) {
 }
 
 
+
 // ============================================================
 //  SESSION TIMER
 // ============================================================
@@ -2788,12 +2609,12 @@ function drawKnob(id) {
   const sa = Math.PI*0.75, ea = Math.PI*2.25;
   const va = sa + (ea-sa)*s.val;
   ctx2.beginPath(); ctx2.arc(cx,cy,r,sa,ea);
-  ctx2.strokeStyle='#c4baac'; ctx2.lineWidth=3; ctx2.stroke();
+  ctx2.strokeStyle=(typeof _lightMode!=='undefined'&&_lightMode)?'#c4baac':'#1e3a5f'; ctx2.lineWidth=3; ctx2.stroke();
   ctx2.beginPath(); ctx2.arc(cx,cy,r,sa,va);
-  ctx2.strokeStyle='#7a5c3e'; ctx2.lineWidth=3; ctx2.stroke();
+  ctx2.strokeStyle=(typeof _lightMode!=='undefined'&&_lightMode)?'#7a5c3e':'#c9a84c'; ctx2.lineWidth=3; ctx2.stroke();
   const dx=cx+(r-2)*Math.cos(va), dy=cy+(r-2)*Math.sin(va);
   ctx2.beginPath(); ctx2.arc(dx,dy,3,0,Math.PI*2);
-  ctx2.fillStyle='#7a5c3e'; ctx2.fill();
+  ctx2.fillStyle=(typeof _lightMode!=='undefined'&&_lightMode)?'#7a5c3e':'#c9a84c'; ctx2.fill();
 }
 
 Object.keys(knobDefs).forEach(id => {
@@ -2850,8 +2671,8 @@ function drawViz() {
     for (let i=0; i<bars; i++) {
       const v = data[i*step]/255;
       const bh = v*H;
-      const hue = 28 + v*18;   /* warm amber 28-46 */
-      c.fillStyle = `hsla(${hue},55%,42%,${0.25+v*0.65})`;
+      const hue = 42 + v*12;   /* gold 42-54 */
+      c.fillStyle = `hsla(${hue},70%,58%,${0.20+v*0.72})`;
       c.fillRect(i*bw+0.5, H-bh, bw-1, bh);
     }
     requestAnimationFrame(frame);
@@ -2860,46 +2681,86 @@ function drawViz() {
 }
 
 // ============================================================
-//  BACKGROUND — warm animated grain texture, no external image
+//  BACKGROUND — deep navy, twinkling gold + silver stars
 // ============================================================
 (function() {
   const canvas = document.getElementById('cosmos');
   const ctx2   = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function buildStars() {
+    stars = Array.from({ length: 160 }, () => ({
+      x:  Math.random() * W,
+      y:  Math.random() * H,
+      r:  Math.random() * 0.9 + 0.1,
+      a:  Math.random() * Math.PI * 2,
+      sp: 0.003 + Math.random() * 0.004,
+      base: 0.04 + Math.random() * 0.22,
+    }));
+  }
 
   function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+    buildStars();
     draw();
   }
 
+  let raf;
   function draw() {
-    const W = canvas.width, H = canvas.height;
-    // Warm parchment base gradient — consistent with CSS but adds depth
-    const grad = ctx2.createRadialGradient(W*0.3, H*0.25, 0, W*0.5, H*0.5, Math.max(W,H)*0.75);
-    grad.addColorStop(0,   'rgba(212,185,148,0.18)');
-    grad.addColorStop(0.4, 'rgba(200,170,130,0.08)');
-    grad.addColorStop(1,   'rgba(180,155,120,0.04)');
-    ctx2.clearRect(0,0,W,H);
-    ctx2.fillStyle = grad;
-    ctx2.fillRect(0,0,W,H);
+    ctx2.clearRect(0, 0, W, H);
 
-    // Subtle film-grain noise overlay for texture
-    // Use tiny semi-transparent dots at random positions
-    const grainCount = Math.floor(W * H / 260);
-    for (let i = 0; i < grainCount; i++) {
-      const x  = Math.random() * W;
-      const y  = Math.random() * H;
-      const a  = Math.random() * 0.045;
-      const r  = Math.random() * 0.7 + 0.15;
-      ctx2.beginPath();
-      ctx2.arc(x, y, r, 0, Math.PI*2);
-      ctx2.fillStyle = `rgba(100,75,50,${a})`;
-      ctx2.fill();
+    if (typeof _lightMode !== 'undefined' && _lightMode) {
+      // Light mode: soft warm paper gradient, no stars
+      const gL = ctx2.createRadialGradient(W*0.25, H*0.20, 0, W*0.5, H*0.5, Math.max(W,H)*0.8);
+      gL.addColorStop(0,   'rgba(200,160,100,0.09)');
+      gL.addColorStop(0.5, 'rgba(170,140,110,0.04)');
+      gL.addColorStop(1,   'rgba(150,130,100,0.02)');
+      ctx2.fillStyle = gL;
+      ctx2.fillRect(0, 0, W, H);
+      raf = requestAnimationFrame(draw);
+      return;
     }
 
-    // Update wallpaper badge
+    // Dark mode: deep navy base gradient with gold light-leak top-left
+    const grad = ctx2.createRadialGradient(W * 0.18, H * 0.12, 0, W * 0.5, H * 0.5, Math.max(W, H) * 0.85);
+    grad.addColorStop(0,    'rgba(40,28,8,0.22)');
+    grad.addColorStop(0.35, 'rgba(15,30,55,0.15)');
+    grad.addColorStop(1,    'rgba(5,12,25,0.10)');
+    ctx2.fillStyle = grad;
+    ctx2.fillRect(0, 0, W, H);
+
+    // Twinkling micro-stars
+    const now = performance.now() * 0.001;
+    stars.forEach(s => {
+      const alpha = s.base * (0.5 + 0.5 * Math.sin(s.a + now * s.sp * 4));
+      ctx2.beginPath();
+      ctx2.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      const warm = s.base > 0.16;
+      ctx2.fillStyle = warm
+        ? `rgba(232,200,100,${alpha})`
+        : `rgba(180,200,230,${alpha * 0.7})`;
+      ctx2.fill();
+    });
+
+    // Gold diagonal shimmer lines
+    ctx2.save();
+    ctx2.globalAlpha = 0.025;
+    for (let i = 0; i < 3; i++) {
+      const x0 = W * (0.1 + i * 0.35);
+      const grad2 = ctx2.createLinearGradient(x0, 0, x0 + H * 0.6, H);
+      grad2.addColorStop(0,   'transparent');
+      grad2.addColorStop(0.4, 'rgba(232,200,100,0.6)');
+      grad2.addColorStop(1,   'transparent');
+      ctx2.fillStyle = grad2;
+      ctx2.fillRect(x0, 0, 2, H);
+    }
+    ctx2.restore();
+
     const lbl = document.getElementById('wallpaper-topic-label');
-    if (lbl) lbl.textContent = 'warm parchment';
+    if (lbl && !lbl._set) { lbl.textContent = 'deep navy'; lbl._set = true; }
+
+    raf = requestAnimationFrame(draw);
   }
 
   window.addEventListener('resize', resize);
@@ -2933,6 +2794,17 @@ function showToast(msg) {
   t.classList.add('show');
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ============================================================
+//  THEME TOGGLE
+// ============================================================
+function toggleTheme() {
+  _lightMode = !_lightMode;
+  document.body.classList.toggle('light', _lightMode);
+  // Dark mode → show moon. Light mode → show sun.
+  document.getElementById('theme-btn').textContent = _lightMode ? '\u2600\uFE0F' : '\uD83C\uDF19';
+  Object.keys(knobDefs).forEach(id => drawKnob(id));
 }
 
 // Auto-next button initial state
